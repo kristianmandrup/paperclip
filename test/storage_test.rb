@@ -2,11 +2,7 @@ require 'test/helper'
 require 'aws/s3'
 
 class StorageTest < Test::Unit::TestCase
-  def rails_env(env)
-    silence_warnings do
-      Object.const_set(:RAILS_ENV, env)
-    end
-  end
+  include Paperclip::RailsHelper
 
   context "Parsing S3 credentials" do
     setup do
@@ -18,7 +14,7 @@ class StorageTest < Test::Unit::TestCase
       @dummy = Dummy.new
       @avatar = @dummy.avatar
 
-      @current_env = RAILS_ENV
+      @current_env = get_rails_env
     end
 
     teardown do
@@ -56,29 +52,29 @@ class StorageTest < Test::Unit::TestCase
       
       @dummy = Dummy.new
       @avatar = @dummy.avatar
-      @current_env = RAILS_ENV
+      @current_env = get_rails_env
     end
 
     teardown do
-      Object.const_set("RAILS_ENV", @current_env)
+      rails_env(@current_env)
     end
 
     should "get the correct credentials when RAILS_ENV is production" do
-      Object.const_set('RAILS_ENV', "production")
+      rails_env("production")
       assert_equal({:username => "minter"},
                    @avatar.parse_credentials('production' => {:username => 'minter'},
                                              :development => {:username => "mcornick"}))
     end
 
     should "get the correct credentials when RAILS_ENV is development" do
-      Object.const_set('RAILS_ENV', "development")
+      rails_env("development")
       assert_equal({:key => "mcornick"},
                    @avatar.parse_credentials('production' => {:key => 'minter'},
                                              :development => {:key => "mcornick"}))
     end
 
     should "return the argument if the key does not exist" do
-      Object.const_set('RAILS_ENV', "not really an env")
+      rails_env("not really an env")
       assert_equal({:test => "minter"}, @avatar.parse_credentials(:test => "minter"))
     end
   end
@@ -198,7 +194,7 @@ class StorageTest < Test::Unit::TestCase
                       :development  => { :bucket => "dev_bucket" }
                     }
       @dummy = Dummy.new
-      @old_env = RAILS_ENV
+      @old_env = get_rails_env
     end
 
     teardown{ rails_env(@old_env) }
@@ -224,18 +220,18 @@ class StorageTest < Test::Unit::TestCase
                       :development  => { :container => "dev_container" }
                     }
       @dummy = Dummy.new
-      @old_env = RAILS_ENV
+      @old_env = get_rails_env
     end
 
-    teardown{ Object.const_set("RAILS_ENV", @old_env) }
+    teardown{ rails_env(@old_env) }
 
     should "get the right container in production" do
-      Object.const_set("RAILS_ENV", "production")
+      rails_env("production")
       assert_equal "prod_container", @dummy.avatar.container_name
     end
 
     should "get the right bucket in development" do
-      Object.const_set("RAILS_ENV", "development")
+      rails_env("development")      
       assert_equal "dev_container", @dummy.avatar.container_name
     end
   end

@@ -53,12 +53,12 @@ module Paperclip
 
     # Returns the RAILS_ROOT constant.
     def rails_root attachment, style_name
-      RAILS_ROOT
+      defined?(Rails.root) && Rails.root ? Rails.root : RAILS_ROOT      
     end
 
     # Returns the RAILS_ENV constant.
     def rails_env attachment, style_name
-      RAILS_ENV
+      defined?(Rails.env) && Rails.env ? Rails.env : RAILS_ENV
     end
 
     # Returns the underscored, pluralized version of the class name.

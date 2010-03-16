@@ -56,7 +56,9 @@
 #   to interpolate. Keys should be unique, like filenames, and despite the fact that
 #   S3 (strictly speaking) does not support directories, you can still use a / to
 #   separate parts of your file name.
-module S3
+module S3  
+  include Paperclip::Storage::Base
+  
   def self.extended base
     begin
       require 'aws/s3'
@@ -105,7 +107,7 @@ module S3
 
   def parse_credentials creds
     creds = find_credentials(creds).stringify_keys
-    (creds[RAILS_ENV] || creds).symbolize_keys
+    (creds[get_rails_env] || creds).symbolize_keys
   end
 
   def exists?(style = default_style)

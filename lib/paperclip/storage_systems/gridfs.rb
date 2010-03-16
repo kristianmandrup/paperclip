@@ -1,4 +1,4 @@
-puts "Paperclip::Storage::Gridfs included"
+# puts "Paperclip::Storage::Gridfs included"
 
 # MongoDB's GridFS storage system (http://www.mongodb.org/display/DOCS/GridFS) uses
 # a chunking strategy to store files in a mongodb database.
@@ -15,7 +15,9 @@ puts "Paperclip::Storage::Gridfs included"
 # within the database rather than the file system, you'll need to work out a method
 # to extract the file data to serve it over HTTP. This is pretty trivial using
 # Rails Metal.
-module Gridfs
+module Gridfs   
+  include Paperclip::Storage::Base
+  
   def self.extended base
     begin
       require 'mongo'
@@ -44,7 +46,7 @@ module Gridfs
   
   def parse_credentials creds
     creds = find_credentials(creds).stringify_keys
-    (creds[RAILS_ENV] || creds).symbolize_keys
+    (creds[get_rails_env] || creds).symbolize_keys
   end
   
   def exists?(style = default_style)

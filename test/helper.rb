@@ -21,7 +21,13 @@ end
 
 ROOT       = File.join(File.dirname(__FILE__), '..')
 RAILS_ROOT = ROOT
-RAILS_ENV  = "test"
+
+if defined?(Rails.env) && Rails.env 
+  Rails.env = 'test'
+else
+  RAILS_ENV  = 'test'
+end
+
 
 $LOAD_PATH << File.join(ROOT, 'lib')
 $LOAD_PATH << File.join(ROOT, 'lib', 'paperclip')
@@ -73,15 +79,14 @@ def rebuild_class options = {}
   end
 end
 
-def temporary_rails_env(new_env)
-  old_env = Object.const_defined?("RAILS_ENV") ? RAILS_ENV : nil
-  silence_warnings do
-    Object.const_set("RAILS_ENV", new_env)
-  end
-  yield
-  silence_warnings do
-    Object.const_set("RAILS_ENV", old_env)
-  end
+
+include Paperclip::RailsHelper  
+
+def temporary_rails_env(new_env)   
+  old_env = get_rails_env
+  rails_env(new_env)
+  yield             
+  rails_env(old_env)
 end
 
 class FakeModel

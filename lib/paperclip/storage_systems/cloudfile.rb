@@ -39,7 +39,9 @@
 #   you will want to interpolate. Keys should be unique, like filenames, and despite the fact that
 #   Cloud Files (strictly speaking) does not support directories, you can still use a / to
 #   separate parts of your file name, and they will show up in the URL structure.
-module CloudFile
+module CloudFile 
+  include Paperclip::Storage::Base
+  
   def self.extended base
     require 'cloudfiles'
     base.instance_eval do
@@ -77,7 +79,7 @@ module CloudFile
 
   def parse_credentials creds
     creds = find_credentials(creds).stringify_keys
-    (creds[RAILS_ENV] || creds).symbolize_keys
+    (creds[get_rails_env] || creds).symbolize_keys
   end
 
   def exists?(style = default_style)

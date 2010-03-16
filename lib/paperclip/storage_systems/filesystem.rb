@@ -15,7 +15,9 @@
 #   public directory.
 #   See Paperclip::Attachment#interpolate for more information on variable interpolaton.
 #     :path => "/var/app/attachments/:class/:id/:style/:basename.:extension"
-module Filesystem
+module Filesystem  
+  include Paperclip::Storage::Base
+  
   def self.extended base
   end
   
